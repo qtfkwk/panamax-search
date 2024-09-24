@@ -1,0 +1,15 @@
+[package]
+name = "panamax-search"
+version = "0.1.0"
+edition = "2021"
+description = "Search crates in a panamax mirror like `cargo search`"
+repository = "https://github.com/qtfkwk/panamax-search"
+license = "MIT"
+
+[dependencies]
+panamax-search-lib = "0.1.0"
+anyhow = "1.0.89"
+clap = { version = "4.5.18", features = ["derive", "wrap_help"] }
+env_logger = "0.11.5"
+expanduser = "1.2.2"
+log = "0.4.22"
