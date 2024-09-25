@@ -1,6 +1,6 @@
 # About
 
-Search crates in a panamax mirror like `cargo search`
+Search crates in a [panamax] mirror like `cargo search`
 
 - Parses each crate name, latest version, and latest non-yanked version from its index file
 - Extracts each crate's description from its crate file
@@ -10,6 +10,14 @@ Search crates in a panamax mirror like `cargo search`
 - Search results are categorized by search relevance (exact name match, name contains, or
   description contains)
 - Search results can be formatted like `cargo search` output
+
+See also:
+
+* `panamax-search`: Command line utility crate
+  ([Crates.io](https://crates.io/crates/panamax-search),
+  [GitHub](https://github.com/qtfkwk/panamax-search/tree/main/crates/cli))
+
+[panamax]: https://crates.io/crates/panamax
 
 # Notes
 
