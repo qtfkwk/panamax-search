@@ -5,4 +5,5 @@
     * 0.1.2 (2024-09-25): Fix lib/cli readmes
 * 0.2.0 (2024-10-26): Add clap color; update dependencies
     * 0.2.1 (2024-12-04): Update dependencies
+    * 0.2.2 (2025-02-21): Update dependencies
 
