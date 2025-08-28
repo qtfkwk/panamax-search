@@ -1,6 +1,6 @@
 use {
-    anyhow::{anyhow, Result},
-    clap::{builder::Styles, ArgAction::Count, Parser},
+    anyhow::{Result, anyhow},
+    clap::{ArgAction::Count, Parser, builder::Styles},
     expanduser::expanduser,
     log::LevelFilter::*,
     panamax_search_lib::Index,

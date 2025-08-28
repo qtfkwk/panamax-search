@@ -1,6 +1,6 @@
 use {
     crate::functions::path_parent,
-    anyhow::{anyhow, Result},
+    anyhow::{Result, anyhow},
     flate2::read::GzDecoder,
     log::*,
     rev_lines::RevLines,

@@ -1,5 +1,5 @@
 use {
-    anyhow::{anyhow, Result},
+    anyhow::{Result, anyhow},
     log::error,
     std::path::Path,
     walkdir::DirEntry,
