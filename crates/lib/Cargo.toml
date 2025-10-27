@@ -1,22 +1,22 @@
 [package]
 name = "panamax-search-lib"
-version = "0.3.0"
+version = "0.3.1"
 edition = "2024"
 description = "Search crates in a panamax mirror like `cargo search`"
 repository = "https://github.com/qtfkwk/panamax-search"
 license = "MIT"
 
 [dependencies]
-anyhow = "1.0.99"
-flate2 = "1.1.2"
-log = "0.4.27"
-owo-colors = "4.2.2"
+anyhow = "1.0.100"
+flate2 = "1.1.5"
+log = "0.4.28"
+owo-colors = "4.2.3"
 rayon = "1.11.0"
-regex = "1.11.2"
+regex = "1.12.2"
 rev_lines = "0.3.0"
-semver = { version = "1.0.26", features = ["serde"] }
-serde = { version = "1.0.219", features = ["derive"] }
-serde_json = "1.0.143"
+semver = { version = "1.0.27", features = ["serde"] }
+serde = { version = "1.0.228", features = ["derive"] }
+serde_json = "1.0.145"
 tar = "0.4.44"
-toml = { version = "0.9.5", features = ["parse"] }
+toml = { version = "0.9.8", features = ["parse"] }
 walkdir = "2.5.0"
