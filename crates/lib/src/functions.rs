@@ -23,11 +23,13 @@ pub fn filter_entries(entry: &DirEntry) -> bool {
 
 pub fn ensure_directory(directory: &Path) -> Result<()> {
     if !directory.exists() {
+        let directory = directory.display().to_string();
         error!("Directory does not exist {directory:?}");
         return Err(anyhow!("Directory does not exist {directory:?}"));
     }
 
     if !directory.is_dir() {
+        let directory = directory.display().to_string();
         error!("Directory is not a directory {directory:?}");
         return Err(anyhow!("Directory is not a directory {directory:?}"));
     }

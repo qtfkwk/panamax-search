@@ -2,7 +2,7 @@ use {
     crate::functions::path_parent,
     anyhow::{Result, anyhow},
     flate2::read::GzDecoder,
-    log::*,
+    log::debug,
     rev_lines::RevLines,
     semver::Version,
     serde::{Deserialize, Serialize},
@@ -30,7 +30,9 @@ pub struct Crate {
 
 impl Crate {
     pub fn new(index_file: &Path) -> Result<Crate> {
-        debug!("{index_file:?}");
+        let index_file_s = index_file.display().to_string();
+
+        debug!("{index_file_s:?}");
 
         let mut name = None;
         let mut latest_ny = None;
@@ -61,19 +63,19 @@ impl Crate {
                         }
                         Err(e) => {
                             return Err(anyhow!(
-                                "{index_file:?}: Deserialization errror: {e}; line = {line:?}"
+                                "{index_file_s:?}: Deserialization errror: {e}; line = {line:?}"
                             ));
                         }
                     }
                 }
 
                 if name.is_none() {
-                    return Err(anyhow!("{index_file:?}: No name"));
+                    return Err(anyhow!("{index_file_s:?}: No name"));
                 }
 
                 if latest.is_none() && latest_ny.is_none() {
                     return Err(anyhow!(
-                        "{index_file:?}: No latest or latest non-yanked version"
+                        "{index_file_s:?}: No latest or latest non-yanked version"
                     ));
                 }
 
@@ -84,12 +86,14 @@ impl Crate {
                     latest,
                 })
             }
-            Err(e) => Err(anyhow!("{index_file:?}: Could not open file: {e}")),
+            Err(e) => Err(anyhow!("{index_file_s:?}: Could not open file: {e}")),
         }
     }
 
     pub fn add_description(&mut self, index_file: &Path) {
         let (crate_file, version) = self.crate_file_and_version(index_file);
+
+        let crate_file_s = crate_file.display().to_string();
 
         match self.get_cargo_toml(&crate_file, &version) {
             Ok(content) => {
@@ -99,30 +103,30 @@ impl Crate {
                         if let Some(d) = t.package.description {
                             self.description = Some(d.clone());
                         } else {
-                            debug!("{crate_file:?}: No package.description");
+                            debug!("{crate_file_s:?}: No package.description");
                         }
                     }
                     Err(_e) => {
                         // Try to deserialize with a `project` section
                         match toml::from_str::<CargoTomlProject>(&content) {
                             Ok(t) => {
-                                debug!("{crate_file:?}: Has project section");
+                                debug!("{crate_file_s:?}: Has project section");
                                 if let Some(d) = t.project.description {
                                     self.description = Some(d.clone());
                                 } else {
-                                    debug!("{crate_file:?}: No project.description");
+                                    debug!("{crate_file_s:?}: No project.description");
                                 }
                             }
                             Err(e) => {
                                 // Failed to deserialize
-                                debug!("{crate_file:?}: Deserialization error: {e:?}");
+                                debug!("{crate_file_s:?}: Deserialization error: {e:?}");
                             }
                         }
                     }
                 }
             }
             Err(e) => {
-                debug!("{crate_file:?}: {e}");
+                debug!("{crate_file_s:?}: {e}");
             }
         }
     }
@@ -171,27 +175,23 @@ impl Crate {
     }
 
     fn get_cargo_toml(&self, crate_file: &Path, version: &str) -> Result<String> {
+        let crate_file_s = crate_file.display().to_string();
         let file = File::open(crate_file)?;
         let decoder = GzDecoder::new(file);
         let mut r = tar::Archive::new(decoder);
 
-        for entry in r.entries()? {
-            match entry {
-                Ok(mut entry) => {
-                    let path = entry.path()?;
-                    let path = path.to_str().unwrap();
-                    for filename in ["Cargo.toml", "cargo.toml"] {
-                        if path == format!("{}-{version}/{filename}", self.name) {
-                            if filename == "cargo.toml" {
-                                debug!("{crate_file:?}: Has cargo.toml");
-                            }
-                            let mut s = String::new();
-                            entry.read_to_string(&mut s)?;
-                            return Ok(s);
-                        }
+        for mut entry in r.entries()?.flatten() {
+            let path = entry.path()?;
+            let path = path.to_str().unwrap();
+            for filename in ["Cargo.toml", "cargo.toml"] {
+                if path == format!("{}-{version}/{filename}", self.name) {
+                    if filename == "cargo.toml" {
+                        debug!("{crate_file_s:?}: Has cargo.toml");
                     }
+                    let mut s = String::new();
+                    entry.read_to_string(&mut s)?;
+                    return Ok(s);
                 }
-                _ => continue,
             }
         }
 

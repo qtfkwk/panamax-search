@@ -5,7 +5,7 @@ use {
         search::Search,
     },
     anyhow::{Result, anyhow},
-    log::*,
+    log::{error, info, trace},
     rayon::prelude::*,
     serde::{
         Deserialize,
@@ -23,6 +23,12 @@ use {
 pub struct Index(BTreeMap<String, Crate>);
 
 impl Index {
+    /**
+    # Errors
+
+    Returns an error if it is not able to load the index from either the cache file or the mirror
+    directory
+    */
     pub fn load(mirror_directory: &Path) -> Result<Index> {
         if let Ok(index) = Index::load_from_cache_file(mirror_directory) {
             Ok(index)
@@ -31,36 +37,56 @@ impl Index {
         }
     }
 
+    /**
+    # Errors
+
+    Returns an error if it is not able to load the index from the cache file
+    */
     pub fn load_from_cache_file(mirror_directory: &Path) -> Result<Index> {
         ensure_directory(mirror_directory)?;
 
         let cache_file = mirror_directory.join("search.json");
         let config_file = mirror_directory.join("crates.io-index").join("config.json");
 
+        let cache_file_s = cache_file.display().to_string();
+
         if cache_file.is_file() && config_file.is_file() {
             if cache_file.metadata()?.modified()? > config_file.metadata()?.modified()? {
-                info!("Load index from cache file {cache_file:?}");
+                info!("Load index from cache file {cache_file_s:?}");
 
                 return match read_to_string(&cache_file) {
                     Ok(s) => Index::from_json(&s),
                     Err(e) => {
-                        error!("Could not read cache file {cache_file:?}: {e}");
-                        Err(anyhow!("Could not read cache file {cache_file:?}: {e}"))
+                        error!("Could not read cache file {cache_file_s:?}: {e}");
+                        Err(anyhow!("Could not read cache file {cache_file_s:?}: {e}"))
                     }
                 };
-            } else {
-                info!("Cache file is old {cache_file:?}");
-                return Err(anyhow!("Cache file is old {cache_file:?}"));
             }
+
+            info!("Cache file is old {cache_file_s:?}");
+            return Err(anyhow!("Cache file is old {cache_file_s:?}"));
         }
 
-        Err(anyhow!("Cannot load index from cache file {cache_file:?}"))
+        Err(anyhow!(
+            "Cannot load index from cache file {cache_file_s:?}",
+        ))
     }
 
+    /**
+    # Panics
+
+    Panics if not able to load a crate from the index file
+
+    # Errors
+
+    Returns an error is not able to save the cache file
+    */
     pub fn load_from_mirror_directory(mirror_directory: &Path) -> Result<Index> {
         ensure_directory(mirror_directory)?;
 
-        info!("Load index from mirror directory {mirror_directory:?}");
+        let mirror_directory_s = mirror_directory.display().to_string();
+
+        info!("Load index from mirror directory {mirror_directory_s:?}");
         let index = Index(
             WalkDir::new(mirror_directory.join("crates.io-index"))
                 .sort_by_file_name()
@@ -89,10 +115,12 @@ impl Index {
     }
 
     fn save(&self, cache_file: &Path) -> Result<()> {
-        info!("Save cache file {cache_file:?}");
+        let cache_file_s = cache_file.display().to_string();
+        info!("Save cache file {cache_file_s:?}");
         Ok(BufWriter::new(File::create(cache_file)?).write_all(self.to_json()?.as_bytes())?)
     }
 
+    #[must_use]
     pub fn search(&self, queries: &[String], case_insensitive: bool) -> Search {
         Search::new(queries, case_insensitive, &self.0)
     }
@@ -163,7 +191,7 @@ impl<'de> Visitor<'de> for IndexVisitor {
         let mut crates = BTreeMap::new();
 
         while let Some((name, mut crate_)) = access.next_entry::<String, Crate>()? {
-            crate_.name = name.clone();
+            crate_.name.clone_from(&name);
             crates.insert(name, crate_);
         }
 

@@ -127,7 +127,7 @@ impl Search {
                     let (nv, d) = if highlight_matches {
                         (
                             &self.highlight(name_and_version),
-                            &self.highlight(&d.replace("\n", "\\n").replace("\r", "\\r")),
+                            &self.highlight(&d.replace('\n', "\\n").replace('\r', "\\r")),
                         )
                     } else {
                         (name_and_version, d)
@@ -140,8 +140,7 @@ impl Search {
                     format!("{name_and_version}\n")
                 }
             })
-            .collect::<Vec<_>>()
-            .join("")
+            .collect()
     }
 
     fn highlight(&self, s: &str) -> String {

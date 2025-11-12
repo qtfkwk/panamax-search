@@ -40,8 +40,8 @@ See also:
 
 2. JSON was chosen as the cache file format for a few reasons.
    TOML was a leading contender for consistency, but unfortunately it isn't extremely conducive to
-   BTreeMap data; in particular, it puts each crate in a `[crates.name]` section with `version` and
-   `description` fields, which makes it less than the ideal (1 crate per line) and impossible to
+   `BTreeMap` data; in particular, it puts each crate in a `[crates.name]` section with `version`
+   and `description` fields, which makes it less than the ideal (1 crate per line) and impossible to
    usefully deserialize the `name` field (?).
    JSON doesn't have these problems and can also be easily queried by both native web as well as CLI
    tools like `jq`.

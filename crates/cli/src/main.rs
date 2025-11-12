@@ -1,22 +1,14 @@
 use {
     anyhow::{Result, anyhow},
-    clap::{ArgAction::Count, Parser, builder::Styles},
+    clap::{ArgAction::Count, Parser},
+    clap_cargo::style::CLAP_STYLING,
     expanduser::expanduser,
-    log::LevelFilter::*,
+    log::LevelFilter::{Debug, Info, Trace, Warn},
     panamax_search_lib::Index,
 };
 
-const STYLES: Styles = Styles::styled()
-    .header(clap_cargo::style::HEADER)
-    .usage(clap_cargo::style::USAGE)
-    .literal(clap_cargo::style::LITERAL)
-    .placeholder(clap_cargo::style::PLACEHOLDER)
-    .error(clap_cargo::style::ERROR)
-    .valid(clap_cargo::style::VALID)
-    .invalid(clap_cargo::style::INVALID);
-
 #[derive(Parser)]
-#[command(about, version, max_term_width = 80, styles = STYLES)]
+#[command(about, version, max_term_width = 80, styles = CLAP_STYLING)]
 struct Cli {
     /// Force update the cache file and exit
     #[arg(short = 'U', conflicts_with_all = ["search", "include_yanked", "case_sensitive"])]
