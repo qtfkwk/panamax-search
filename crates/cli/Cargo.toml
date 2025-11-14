@@ -1,6 +1,6 @@
 [package]
 name = "panamax-search"
-version = "0.3.2"
+version = "0.3.3"
 edition = "2024"
 description = "Search crates in a panamax mirror like `cargo search`"
 repository = "https://github.com/qtfkwk/panamax-search"
@@ -13,4 +13,4 @@ clap = { version = "4.5.51", features = ["derive", "wrap_help"] }
 env_logger = "0.11.8"
 expanduser = "1.2.2"
 log = "0.4.28"
-panamax-search-lib = { version = "0.3.2", path = "../lib" }
+panamax-search-lib = { version = "0.3.3", path = "../lib" }
