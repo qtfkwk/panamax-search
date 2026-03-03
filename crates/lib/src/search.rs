@@ -99,8 +99,8 @@ impl Search {
         // Collate results in order from each category and measure the widest name and version
         for v in [&self.name_exact, &self.name_contains, &self.desc_contains] {
             for crate_ in v {
-                let version = if include_yanked && crate_.latest.is_some() {
-                    crate_.latest.as_ref().unwrap().to_string()
+                let version = if include_yanked && let Some(latest) = crate_.latest.as_ref() {
+                    latest.to_string()
                 } else {
                     crate_
                         .latest_ny
